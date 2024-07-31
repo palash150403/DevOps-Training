@@ -13,7 +13,24 @@ You are tasked with setting up a CI/CD pipeline using Jenkins to streamline the 
 
 - GitHub Repository: A GitHub repository containing:
     - The source code of a simple Java application.
+```
+class App{
+    public static void main(String args[]){
+        System.out.println("Hello wold");
+    }
+}
+
+```
+-   
     - A Dockerfile for building the Docker image.
+```
+FROM openjdk:11
+COPY . /usr/src/myapp
+WORKDIR /usr/src/myapp
+RUN javac App.java
+CMD ["java", "App"]
+
+```
 - Jenkins Pipeline Script: A Jenkinsfile (pipeline script) that:
     - Clones the GitHub repository.
     - Builds the Docker image.
@@ -25,9 +42,16 @@ You are tasked with setting up a CI/CD pipeline using Jenkins to streamline the 
     - Jenkins installed and configured on a local Ubuntu machine.
     - Required plugins installed (e.g., Git, Docker, Pipeline).
 
-- Documentation: Detailed documentation explaining:
+- Documentation: 
 
     - How to set up the local Jenkins environment.
-    - Configuration steps for the pipeline.
-    - Instructions for verifying the deployment.
+![alt text](Images/im1.png)
+![alt text](<Images/Screenshot from 2024-07-29 15-52-59.png>)
+    - Builds the Docker image.
+    - Pushes the Docker image to DockerHub.
+![alt text](<Images/Screenshot from 2024-07-31 10-48-06.png>)
 
+    - Final build
+    ![alt text](<Images/Screenshot from 2024-07-29 15-52-17.png>)
+    ![alt text](<Images/Screenshot from 2024-07-29 15-52-21.png>)
+    ![alt text](<Images/Screenshot from 2024-07-29 15-52-43.png>)
