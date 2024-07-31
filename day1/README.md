@@ -7,7 +7,9 @@ Using Nano
 Create a file server_config.txt using Nano:
 
 nano server_config.txt
+
 ![alt text](image.png)
+
 
 ![alt text](image-1.png)
 
@@ -19,28 +21,37 @@ Add a new user developer:
 
 sudo adduser developer
 ![alt text](image-2.png)
+
 Remove the user developer:
 
 sudo deluser developer
+
 ![alt text](image-6.png)
+
 Managing Groups
 Create a group devpteam:
 
 sudo groupadd devpteam
+
 ![alt text](image-3.png)
+
 Add the user developer to the devpteam group:
 
 sudo usermod -aG devpteam developer
+
 ![alt text](image-4.png)
+
 Remove the user developer from the devpteam group:
 
 sudo gpasswd -d developer devpteam
+
 ![alt text](image-5.png)
 
 ### Part 3: File Permissions Management 
 View permissions for server_config.txt:
 
 ls -l server_config.txt
+
 ![alt text](image-7.png)
 
 Changing Permissions and Ownership
@@ -53,20 +64,24 @@ Verify the change:
 ls -l server_config.txt
 
 ![alt text](image-8.png)
+
 Change the owner to developer and the group to devteam:
 
 sudo chown developer:devteam server_config.txt
 
 ![alt text](image-9.png)
+
 Verify the change:
 
 ls -l server_config.txt
 
 ![alt text](image-10.png)
+
 ### Part 4: Controlling Services and Daemons 
 Start the Apache service:
 
 sudo systemctl start apache2
+
 ![alt text](image-11.png)
 
 Stop the Apache service:
@@ -74,14 +89,17 @@ Stop the Apache service:
 sudo systemctl stop apache2
 
 ![alt text](image-12.png)
+
 Enable the Apache service to start on boot:
 
 sudo systemctl enable apache2
+
 ![alt text](image-13.png)
 
 Disable the Apache service:
 
 sudo systemctl disable apache2
+
 ![alt text](image-15.png)
 
 Check the status of the Apache service:
@@ -94,11 +112,13 @@ sudo systemctl status apache2
 List all running processes:
 
 ps aux
+
 ![alt text](image-16.png)
 
 Use top to view processes in real-time:
 
 top
+
 ![alt text](image-17.png)
 
 Managing Processes
@@ -129,17 +149,20 @@ Install Apache2
 Install Apache2 by running:
 
 sudo apt install apache2
+
 ![alt text](image-18.png)
 
 Start and Enable Apache2
 Start the Apache2 service:
 
 sudo systemctl start apache2
+
 ![alt text](image-19.png)
 
 Enable Apache2 to start on boot:
 
 sudo systemctl enable apache2
+
 ![alt text](image-20.png)
 
 
@@ -153,11 +176,13 @@ Create a New Directory for the Website
 
 
 sudo mkdir mystaticwebsite
+
 ![alt text](image-22.png)
 
 Change ownership of the directory:
 
 sudo chown -R $USER:$USER /var/www/html/mystaticwebsite
+
 ![alt text](image-23.png)
 
 Create HTML File
@@ -220,6 +245,7 @@ Download or copy an image file to the website directory:
 cp /path/to/your/logo.png /var/www/html/mystaticwebsite/logo.png
 ```
 ![alt text](image-24.png)
+
 Update index.html to include the image:
 ```
 <body>
@@ -251,6 +277,7 @@ Enable the virtual host configuration:
 ```
 sudo a2ensite mystaticwebsite.conf
 ```
+
 ![alt text](image-25.png)
 
 Disable the Default Site
@@ -258,6 +285,7 @@ Disable the default site configuration:
 ```
 sudo a2dissite 000-default.conf
 ```
+
 ![alt text](image-26.png)
 
 Reload Apache2
@@ -267,6 +295,7 @@ sudo systemctl reload apache2
 ```
 
 Test the Configuration
+
 ![alt text](image-27.png)
 
 
