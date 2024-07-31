@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mystaticwebsite-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mystaticwebsite
+  template:
+    metadata:
+      labels:
+        app: mystaticwebsite
+    spec:
+      containers:
+      - name: mystaticwebsite
+        image: palash150403/mystaticwebsite:latest
+        ports:
+        - containerPort: 80
+        resources:
+            limits:
+              cpu: 50m
+            requests:
+              cpu: 20m

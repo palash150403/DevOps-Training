@@ -1,0 +1,9 @@
+---
+- name: playbook for tasks
+  hosts: all
+
+  tasks: 
+  - name: Installing packages on managed nodes
+    apt:
+      name: nginx
+      state: present

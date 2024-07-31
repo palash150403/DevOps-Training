@@ -1,0 +1,66 @@
+---
+- name: Install Docker and Run an image
+  hosts: localhost
+  become: yes
+
+  tasks:
+    - name: Update apt package index
+      apt:
+        update_cache: yes
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: dist
+
+    - name: Install dependencies for Docker
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+
+    - name: Add Docker's official GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker apt repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu focal stable
+        state: present
+        update_cache: yes
+
+    - name: Install Python and Docker
+      apt:
+        name:
+          - python3
+          - python3-pip
+          - docker-ce
+        state: present
+
+    - name: Enable Docker service
+      systemd:
+        name: docker
+        enabled: yes
+
+    - name: Start Docker service
+      systemd:
+        name: docker
+        state: started
+
+    - name: Pull Docker image
+      docker_image:
+        name: palash150403/jenkins_docker_image
+        tag: latest
+        source: pull
+
+    - name: Run Docker container
+      docker_container:
+        name: my_test_container
+        image: palash150403/jenkins_docker_image
+        state: started
+        restart_policy: always
+        ports:
+          - "81:80"
