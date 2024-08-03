@@ -20,78 +20,82 @@ Defines the AWS Ubuntu instance and connection details for Ansible.
 
 ### Ansible Playbook deploy_database.yml
 ```
-- name: setup Mysql with database db and
-  remote login
+- name: setup Mysql
+  hosts: db
   become: yes
-  hosts: worker-node-01
+  vars:
+    db_name: "my_database"
+    db_user: "my_user"
+    db_password: "user123"
+    backup_dir: "/backup/mysql"
+    backup_schedule: "daily"
 
-  vars_files: 
-    - vars.yml
-  
   tasks:
-    - name: Installing Mysql  and dependencies
-      package:
-       name: "{{item}}"
-       state: present
-       update_cache: yes
-      loop:
-       - mysql-server
-       - mysql-client 
-       - python3-mysqldb
-       - libmysqlclient-dev
-      become: yes
+  - name: Install MySQL server
+    apt:
+      update_cache: yes
+      name: "{{ item }}"
+      state: present
+    with_items:
+    - mysql-server
+    - mysql-client
+    - python3-mysqldb
+    - libmysqlclient-dev
 
-    - name: start and enable mysql service
-      service:
-        name: mysql
-        state: started
-        enabled: yes
+  - name: Copy MySQL configuration file
+    template:
+      src: /home/einfochips/day17/project1/templates/mysql.cnf.j2
+      dest: /etc/mysql/mysql.conf.d/mysqld.cnf
+    notify: Restart MySQL
 
-    - name: creating mysql user
-      mysql_user:
-        name: "{{db_user}}"
-        password: "{{db_pass}}"
-        priv: '*.*:ALL'
-        host: '%'
-        state: present
+  - name: Ensure MySQL service is running and enabled
+    service:
+      name: mysql
+      state: started
+      enabled: yes
 
-    - name: creating database
-      mysql_db:
-        name: "{{db_name}}"
-        state: present
+  - name: Create MySQL user
+    mysql_user:
+      name: "{{ db_user }}"
+      password: "{{ db_password }}"
+      priv: '*.*:ALL'
+      host: '%'
+      state: present
 
-    - name: Enable remote login to mysql
-      lineinfile:
-         path: /etc/mysql/mysql.conf.d/mysqld.cnf
-         regexp: '^bind-address'
-         line: 'bind-address = 0.0.0.0'
-         backup: yes
-      notify:
-         - Restart mysql 
+  - name: Create MySQL database
+    mysql_db:
+      name: "{{ db_name }}"
+      state: present
 
-    - name: Create Backup Directory
-      file: 
-        path: /var/backups/mysql
-        state: directory
+  - name: Configure backup directory
+    file:
+      path: "{{ backup_dir }}"
+      state: directory
+      mode: '0755'
 
-    - name: Create Backup Script
-      copy:
-        src: scripts/backup.sh
-        dest: ~/
-        mode: 0755
+  - name: Copy MySQL backup script
+    copy:
+      src: /home/einfochips/day17/project1/scripts/backup.sh
+      dest: /usr/local/bin/mysql_backup.sh
+      mode: '0755'
 
-    - name: Create a cron job
-      cron:
-        name: "MySQL Backup"
-        minute: "2"
-        hour: "0"
-        job: "~/backup.sh"  
+  - name: Configure backup cron job
+    cron:
+      name: "mysql backup"
+      minute: "0"
+      hour: "2"
+      day: "*"
+      month: "*"
+      weekday: "*"
+      job: "/usr/local/bin/mysql_backup.sh"
+      state: present
+
 
   handlers:
-    - name: Restart mysql
-      service:
-        name: mysql
-        state: restarted
+  - name: Restart MySQL
+    service:
+      name: mysql
+      state: restarted
 ```
 Automates the installation of PostgreSQL, sets up the database, creates a user, and configures a cron job for backups. It also includes variables for database configuration and backup settings.
 
@@ -102,14 +106,21 @@ Automates the installation of PostgreSQL, sets up the database, creates a user, 
 ```
 #!/bin/bash
 
-DB_NAME="db"
-DB_USER="user"
-DB_PASSWORD="pass"
-BACKUP_DIR="/var/backups/mysql"
+# Set variables
+DATABASE_NAME=mydatabase
+BACKUP_DIR=/var/backups/mysql
+DATE=$(date +"%Y-%m-%d")
 
-DATE=$(date +\%F_\%T)
+# Create backup file name
+BACKUP_FILE="${BACKUP_DIR}/${DATABASE_NAME}_${DATE}.sql"
 
-# Perform the backup
-mysqldump -u $DB_USER -p$DB_PASSWORD $DB_NAME > $BACKUP_DIR/backup_$DATE.sql
+# Dump database to backup file
+mysqldump -u myuser -p${database_password} ${DATABASE_NAME} > ${BACKUP_FILE}
+
+# Compress backup file
+gzip ${BACKUP_FILE}
+
+# Remove old backups (keep only 7 days)
+find ${BACKUP_DIR} -type f -mtime +7 -delete
 ```
 A script to perform the backup of the PostgreSQL database. This script should be referenced in the cron job defined in the playbook.
