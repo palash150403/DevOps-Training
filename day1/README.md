@@ -121,20 +121,7 @@ top
 
 ![alt text](image-17.png)
 
-Managing Processes
-Identify a process to kill using ps or top, then kill it:
 
-kill <PID>
-
-
-Change the priority of a process (e.g., running sleep with a lower priority):
-
-nice -n 10 sleep 100 &
-
-
-Change the priority of the process using renice:
-
-renice +10 <PID>
 
 ### Creating and Deploying a Static Website with Apache2
 
