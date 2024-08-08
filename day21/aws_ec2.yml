@@ -1,0 +1,15 @@
+plugin: amazon.aws.aws_ec2
+regions:
+  - us-west-1
+
+filters:
+  instance-state-name:
+    - running
+  tag:Name:         # to select personal assigned instance 
+    - Palash
+
+hostnames:
+  - dns-name
+  
+compose:
+  ansible_host: public_dns_name

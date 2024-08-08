@@ -1,7 +1,7 @@
-root_password: root
-admin_user: root
-admin_password: root
-db_name: root
+mysql_root_password: root
+mysql_user: mysql
+mysql_user_password: mysql
+mysql_db_name: my-db1
 password_validation_policy: 1
 
 
