@@ -272,11 +272,11 @@ rate(node_cpu_seconds_total[5m])
 ```
 
 
-<img src="./images/task_six.png">
+<img src="images/img7.png">
 
 ```
 100 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100)
 ```
 
-<img src="./images/task_six_two.png">
+<img src="images/img8.png">
 
