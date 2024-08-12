@@ -58,15 +58,15 @@ You need to design and estimate the cost for a scalable web application that inc
 
 **Output:** 
 
- - **Application Load Balancer**
+ - **Load Balancer**
 
 ![alt text](image.png)
 
- - **EC2 instances for the application servers**
+ - **EC2 instances**
 
 ![alt text](image-1.png)
 
- - **RDS instance for the database**
+ - **RDS instance**
 
 ![alt text](image-2.png)
  - **Final Budget**
