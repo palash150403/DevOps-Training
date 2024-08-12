@@ -123,6 +123,22 @@ max(node_filesystem_size_bytes - node_filesystem_free_bytes)
 -   Configure Alertmanager with Prometheus.
 -   Create routing rules to manage alert notifications based on severity and service type.
 
+
+
+-   installing the alertmanager
+```
+wget https://github.com/prometheus/alertmanager/releases/download/v0.27.0/alertmanager-0.27.0.linux-amd64.tar.gz
+```
+-   unzip the files
+```
+tar -xvf alertmanager-0.27.0.linux-amd64.tar.gz 
+```
+```
+cd alertmanager-0.27.0.linux-amd64/
+```
+```
+./alertmanager
+```
 ### 8. Writing Alerting Rules
 
 #### Task
@@ -132,12 +148,43 @@ max(node_filesystem_size_bytes - node_filesystem_free_bytes)
 -   Create alerting rules for high CPU usage, memory leaks, and disk space running low.
 -   Ensure alerts are correctly generated and sent to Alertmanager.
 
+```
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+           - localhost:9093
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+    - "rules/rules.yml"
+```
+
+
+
 ### 9. Setting Up Notification Channels (Email, Slack, etc.)
 #### Task
 -   Integrate Alertmanager with multiple notification channels like Email and Slack.
 #### Deliverables
 -   Set up Email notifications for critical alerts.
 -   Integrate Slack for real-time alerts and notifications.
+
+```
+route:
+  receiver: admin
+
+receivers:
+- name: admin
+  slack_configs:
+  - channel: "#prometheus"
+    api_url: "<api-url-link>"
+```
+
+![alt text](<Screenshot from 2024-08-12 15-44-12.png>)
+
+![alt text](<Screenshot from 2024-08-12 15-44-16.png>)
 
 ### 10. Hands-on Exercise: Creating Alerts
 #### Task
@@ -148,5 +195,7 @@ max(node_filesystem_size_bytes - node_filesystem_free_bytes)
 -   Validate the alerts in both notification channels.
 
 
+
+![alt text](<Screenshot from 2024-08-12 15-44-05.png>)
 
 
