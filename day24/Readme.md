@@ -1,4 +1,4 @@
-# Day 23 Task
+# Day 24 Task
 
 **Objective:**
 Participants will create a custom AWS IAM policy that meets a specific condition: allowing access to a designated S3 bucket only for a particular IAM role, without including conditions. They will then estimate the cost for deploying a multi-tier architecture solution using AWS Pricing Calculator.
