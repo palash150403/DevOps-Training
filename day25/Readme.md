@@ -10,7 +10,7 @@
 
  - Set up the bucket for static website hosting.
 
- - Upload the provided static website files (HTML, CSS, images).
+ - Upload the provided static website files (HTML, CSS, Js, images).
 
 ![alt text](image-1.png)
 
