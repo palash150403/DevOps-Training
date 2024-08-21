@@ -190,6 +190,9 @@ minikube ip
 curl http://<minikube-ip>:30001
 ```
 ![alt text](img/image-8.png)
+
+![alt text](image.png)
+
 -   Create and switch to a new branch feature/update-message:
 ```
 git checkout -b feature/update-message
@@ -273,17 +276,24 @@ Check the status of the deployment:
 ```
 kubectl rollout status deployment/nodejs-app
 ```
+![alt text](image-1.png)
 -   Access Through ClusterIP Service
 Forward the port to access the ClusterIP service:
 ```
-kubectl port-forward service/nodejs-service 8080:80
+kubectl port-forward service/nodejs-service 8085:80
 ```
--   Open your browser and navigate to http://localhost:8080 
+-   Open your browser and navigate to http://localhost:8085
+
+![alt text](image-2.png)
 
 -   Access the application using the NodePort:
 ```
 curl http://<minikube-ip>:30001
 ```
+
+![alt text](image-3.png)
+
+![alt text](image-4.png)
 ## Project 02 Deploying a Python Flask App Using Minikube Kubernetes
 
 -   Create a new directory for your project:
