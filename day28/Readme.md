@@ -8,9 +8,12 @@ This project will test your ability to deploy a multi-tier architecture applicat
 You are required to design and deploy a multi-tier application using AWS CloudFormation. The architecture will include the following components:
 
 1. EC2 Instance: Serve as the web server.
+![alt text](image-1.png)
 2. S3 Bucket: Store static assets or configuration files.
+![alt text](image-2.png)
 3. RDS MySQL DB Instance: Serve as the database backend.
 4. VPC: Ensure secure communication between the components.
+![alt text](image-3.png)
 
 #### Specifications:
 
@@ -28,11 +31,14 @@ You are required to design and deploy a multi-tier application using AWS CloudFo
 
      * Define a VPC with one public and one private subnet.
      * Attach an Internet Gateway to the VPC for public subnet access.
+![alt text](image-4.png)
    * Security Groups:
    * Create a security group for the EC2 instance, allowing SSH and HTTP access from a specific IP range.
    * Create a security group for the RDS instance, allowing MySQL access from the EC2 instance only.
+   ![alt text](image-5.png)
    * EC2 Instance:
    * Launch a t2.micro EC2 instance in the public subnet.
+   ![alt text](image.png)
    * Configure the instance to access the S3 bucket and connect to the RDS instance.
    * S3 Bucket:
    * Create an S3 bucket for storing static assets or configuration files.
@@ -61,12 +67,12 @@ You are required to design and deploy a multi-tier application using AWS CloudFo
 
 * Once the deployment and testing are complete, terminate all resources by deleting the CloudFormation stack.
 * Ensure that no resources, such as EC2 instances, RDS instances, or S3 buckets, are left running.
-
 To Achive the following task:
 
 Open AWS console go to the CloudFormation service click on the create stack:
+![alt text](image-6.png)
 
-
+![alt text](image-7.png)
 
 Select the options as shown in above:
 Upload the template file in yaml or json format:
