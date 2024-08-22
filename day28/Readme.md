@@ -79,206 +79,277 @@ Upload the template file in yaml or json format:
 
 ```
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Deploy a multi-tier application with EC2 (Ubuntu), RDS, S3, and VPC without IAM roles in us-east-2
- 
-Parameters:
-  VpcCIDR:
-    Description: CIDR block for the VPC
-    Type: String
-    Default: "10.0.0.0/16"
- 
-  PublicSubnetCIDR1:
-    Description: CIDR block for the first subnet
-    Type: String
-    Default: "10.0.1.0/24"
- 
-  PublicSubnetCIDR2:
-    Description: CIDR block for the second subnet
-    Type: String
-    Default: "10.0.3.0/24"
- 
-  PrivateSubnetCIDR1:
-    Description: CIDR block for the first private subnet
-    Type: String
-    Default: "10.0.2.0/24"
- 
-  PrivateSubnetCIDR2:
-    Description: CIDR block for the second private subnet
-    Type: String
-    Default: "10.0.4.0/24"
- 
-  InstanceType:
-    Description: EC2 instance type
-    Type: String
-    Default: t2.micro
- 
-  DBInstanceType:
-    Description: RDS instance type
-    Type: String
-    Default: db.t3.micro
- 
-  AllowedIP:
-    Description: IP range allowed for SSH access (CIDR notation)
-    Type: String
-    Default: "182.76.141.106/32"
+Description: Multi-Tier Architecture with EC2, S3, RDS, and VPC
 
- 
+Parameters:
+  EnvironmentName:
+    Description: An environment name that is prefixed to resource names
+    Type: String
+
+  VpcCIDR:
+    Description: Please enter the IP range (CIDR notation) for this VPC
+    Type: String
+    Default: 10.192.0.0/16
+
+  PublicSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
+    Type: String
+    Default: 10.192.10.0/24
+
+  PublicSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the second Availability Zone
+    Type: String
+    Default: 10.192.11.0/24  
+
+  PrivateSubnet1CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+    Type: String
+    Default: 10.192.20.0/24
+
+  PrivateSubnet2CIDR:
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+    Type: String
+    Default: 10.192.21.0/24
+
+  InstanceType:
+    Type: String
+    Description: The instance type for the EC2 instance
+    Default: t2.micro
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  ImageId:
+    Type: String
+    Description: The AMI ID for the EC2 instance
+    Default: ami-04a81a99f5ec58529 
+    ConstraintDescription: Must be a valid AMI ID in the region
+
+  DBUsername:
+    Type: String
+    Description: The master username for the RDS instance
+    Default: admin
+
+  DBUserPassword:
+    Type: String
+    Description: The master password for the RDS instance
+    NoEcho: true
+    Default: password
+
+  BucketName:
+    Type: String
+    Description: The name of the S3 bucket
+    Default: Palash-bucket
+
 Resources:
   # VPC
   MyVPC:
-    Type: AWS::EC2::VPC
+    Type: 'AWS::EC2::VPC'
     Properties:
       CidrBlock: !Ref VpcCIDR
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
       Tags:
         - Key: Name
-          Value: MyVPC
- 
-  # Public Subnet 1
-  PublicSubnet1:
-    Type: AWS::EC2::Subnet
+          Value: !Ref EnvironmentName
+
+
+  # Public Subnet
+  PublicSubnet:
+    Type: 'AWS::EC2::Subnet'
     Properties:
       VpcId: !Ref MyVPC
-      CidrBlock: !Ref PublicSubnetCIDR1
+      CidrBlock: !Ref PublicSubnet1CIDR
       AvailabilityZone: !Select [0, !GetAZs '']
-      MapPublicIpOnLaunch: true
+      MapPublicIpOnLaunch: 'true'
       Tags:
         - Key: Name
-          Value: PublicSubnet1
- 
-  # Public Subnet 2
+          Value: PublicSubnet
+
   PublicSubnet2:
-    Type: AWS::EC2::Subnet
+    Type: 'AWS::EC2::Subnet'
     Properties:
       VpcId: !Ref MyVPC
-      CidrBlock: !Ref PublicSubnetCIDR2
+      CidrBlock: !Ref PublicSubnet2CIDR
       AvailabilityZone: !Select [1, !GetAZs '']
-      MapPublicIpOnLaunch: true
+      MapPublicIpOnLaunch: 'true'
       Tags:
         - Key: Name
-          Value: PublicSubnet2
- 
-  # Private Subnet 1
-  PrivateSubnet1:
-    Type: AWS::EC2::Subnet
+          Value: PublicSubnet2        
+
+  # Private Subnet
+  PrivateSubnet:
+    Type: 'AWS::EC2::Subnet'
     Properties:
       VpcId: !Ref MyVPC
-      CidrBlock: !Ref PrivateSubnetCIDR1
+      CidrBlock: !Ref PrivateSubnet1CIDR
       AvailabilityZone: !Select [0, !GetAZs '']
       Tags:
         - Key: Name
-          Value: PrivateSubnet1
- 
-  # Private Subnet 2
+          Value: PrivateSubnet
+
+   # Private Subnet 2
   PrivateSubnet2:
-    Type: AWS::EC2::Subnet
+    Type: 'AWS::EC2::Subnet'
     Properties:
       VpcId: !Ref MyVPC
-      CidrBlock: !Ref PrivateSubnetCIDR2
+      CidrBlock: !Ref  PrivateSubnet2CIDR
       AvailabilityZone: !Select [1, !GetAZs '']
       Tags:
         - Key: Name
-          Value: PrivateSubnet2
- 
+          Value: PrivateSubnet2        
+
   # Internet Gateway
-  MyInternetGateway:
-    Type: AWS::EC2::InternetGateway
+  InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
     Properties:
       Tags:
         - Key: Name
           Value: MyInternetGateway
- 
+
   # Attach Internet Gateway to VPC
   VPCGatewayAttachment:
-    Type: AWS::EC2::VPCGatewayAttachment
+    Type: 'AWS::EC2::VPCGatewayAttachment'
     Properties:
       VpcId: !Ref MyVPC
-      InternetGatewayId: !Ref MyInternetGateway
- 
+      InternetGatewayId: !Ref InternetGateway
+
+  # Route Table for Public Subnet
+  PublicRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref MyVPC
+      Tags:
+        - Key: Name
+          Value: PublicRouteTable
+
+  # Route for Public Subnet to Internet
+  PublicRoute:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref InternetGateway
+
+  # Associate Route Table with Public Subnet
+  PublicSubnetRouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
   # Security Group for EC2
   EC2SecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+    Type: 'AWS::EC2::SecurityGroup'
     Properties:
-      VpcId: !Ref MyVPC
       GroupDescription: Allow SSH and HTTP access
+      VpcId: !Ref MyVPC
       SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: !Ref AllowedIP
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
- 
+        - IpProtocol: 'tcp'
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: '10.0.0.0/24'
+        - IpProtocol: 'tcp'
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: '0.0.0.0/0'
+
   # Security Group for RDS
   RDSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+    Type: 'AWS::EC2::SecurityGroup'
     Properties:
+      GroupDescription: Allow MySQL access from EC2 instance
       VpcId: !Ref MyVPC
-      GroupDescription: Allow MySQL access from EC2 only
       SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 3306
-          ToPort: 3306
+        - IpProtocol: 'tcp'
+          FromPort: '3306'
+          ToPort: '3306'
           SourceSecurityGroupId: !Ref EC2SecurityGroup
- 
+
   # EC2 Instance
-  MyEC2Instance:
-    Type: AWS::EC2::Instance
+  WebServerInstance:
+    Type: 'AWS::EC2::Instance'
     Properties:
       InstanceType: !Ref InstanceType
-      ImageId: ami-0ff591da048329e00  # Replace with the latest Ubuntu AMI ID for us-east-2
-      SubnetId: !Ref PublicSubnet1
+      ImageId: !Ref ImageId
+      SubnetId: !Ref PublicSubnet
       SecurityGroupIds:
         - !Ref EC2SecurityGroup
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          apt-get update
-          apt-get install -y awscli
-          # Example of fetching a file from S3 bucket (replace 'my-application-bucket' with actual bucket name)
-          aws s3 cp s3://my-application-bucket/config-file /path/to/config-file
- 
+      IamInstanceProfile: !Ref EC2InstanceProfile
+
+  # IAM Role for EC2 to access S3
+  EC2InstanceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'ec2.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: 'S3AccessPolicy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 's3:GetObject'
+                  - 's3:PutObject'
+                Resource: 'arn:aws:s3:::Palash-bucket/*'
+
+  # IAM Instance Profile
+  EC2InstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Roles:
+        - !Ref EC2InstanceRole
+
   # S3 Bucket
-  MyS3Bucket:
-    Type: AWS::S3::Bucket
+  ConfigBucket:
+    Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: manan-s3-bucket-1
- 
-  # RDS MySQL DB Instance
-  MyRDSDBInstance:
-    Type: AWS::RDS::DBInstance
+      BucketName: !Ref BucketName
+
+  # RDS DB Instance
+  MySQLDBInstance:
+    Type: 'AWS::RDS::DBInstance'
     Properties:
-      DBInstanceClass: !Ref DBInstanceType
-      Engine: MySQL
-      MasterUsername: admin
-      MasterUserPassword: admin12345
-      DBInstanceIdentifier: DBdatabase01
-      AllocatedStorage: 20
+      DBInstanceClass: 'db.t3.micro'
+      Engine: 'mysql'
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBUserPassword 
+      DBName: 'mydatabase'
       VPCSecurityGroups:
         - !Ref RDSecurityGroup
-      DBSubnetGroupName: !Ref DBSubnetGroup
- 
-  # RDS DB Subnet Group
-  DBSubnetGroup:
-    Type: AWS::RDS::DBSubnetGroup
+      DBSubnetGroupName: !Ref RDSSubnetGroup
+      PubliclyAccessible: 'false'
+      AllocatedStorage: '20'
+
+  # RDS Subnet Group
+  RDSSubnetGroup:
+    Type: 'AWS::RDS::DBSubnetGroup'
     Properties:
-      DBSubnetGroupDescription: Subnet group for RDS
+      DBSubnetGroupDescription: 'Subnet group for RDS'
       SubnetIds:
-        - !Ref PrivateSubnet1
-        - !Ref PrivateSubnet2
- 
+        - !Ref PrivateSubnet
+        - !Ref PrivateSubnet2  
+      Tags:
+        - Key: Name
+          Value: RDSSubnetGroup
+
 Outputs:
-  EC2InstancePublicIP:
-    Description: Public IP of the EC2 instance
-    Value: !GetAtt MyEC2Instance.PublicIp
- 
+  EC2InstanceID:
+    Description: 'ID of the EC2 instance'
+    Value: !Ref WebServerInstance
   S3BucketName:
-    Description: Name of the S3 bucket
-    Value: !Ref MyS3Bucket
- 
+    Description: 'Name of the S3 bucket'
+    Value: !Ref ConfigBucket
   RDSInstanceEndpoint:
-    Description: Endpoint of the RDS instance
-    Value: !GetAtt MyRDSDBInstance.Endpoint.Address
+    Description: 'Endpoint of the RDS MySQL instance'
+    Value: !GetAtt MySQLDBInstance.Endpoint.Address
+  RDSInstancePort:
+    Description: 'Port of the RDS MySQL instance'
+    Value: !GetAtt MySQLDBInstance.Endpoint.Port
+
 ```
 
