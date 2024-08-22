@@ -132,8 +132,10 @@ Configure Terraform to use this DynamoDB table for state locking.
 
     + Verify that Terraform state is being stored in the S3 bucket and that updates are reflected in the remote state file.
 
+![alt text](image-8.png)
 
-
+![alt text](image-9.png)
+![alt text](image-10.png)
 
 
 ### 6. Apply and Modify Infrastructure:
