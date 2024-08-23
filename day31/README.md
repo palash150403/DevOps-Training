@@ -62,7 +62,7 @@ resource "aws_instance" "ec2_instance" {
   key_name       = var.key_name
 
   tags = {
-    Name = "my-ec2-instance-yaksh"
+    Name = "palash-ec2"
   }
 }
 
