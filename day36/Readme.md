@@ -35,7 +35,7 @@ helm install prometheus prometheus-community/prometheus --namespace monitoring
 ```
 ![alt text](image-5.png)
 
-### 4. Deploy Grafana on Kubernetes (20 Minutes)
+### 4. Deploy Grafana on Kubernetes 
 -   Deploy Grafana in the monitoring namespace.
 ```
 helm repo add grafana https://grafana.github.io/helm-charts
