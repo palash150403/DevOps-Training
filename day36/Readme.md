@@ -25,8 +25,16 @@ kubectl create namespace monitoring
 ```
 -   Use a Helm chart to deploy Prometheus or manually deploy Prometheus using Kubernetes manifests.
 ```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+```
+
+![alt text](image-4.png)
+
+```
 helm install prometheus prometheus-community/prometheus --namespace monitoring
 ```
+![alt text](image-5.png)
+
 ### 4. Deploy Grafana on Kubernetes (20 Minutes)
 -   Deploy Grafana in the monitoring namespace.
 ```
@@ -36,6 +44,9 @@ helm repo add grafana https://grafana.github.io/helm-charts
 ```
 helm install grafana grafana/grafana --namespace monitoring
 ```
+![alt text](image-6.png)
+
+![alt text](image-9.png)
 
 -   Expose Grafana using a Kubernetes service and set up port forwarding or a LoadBalancer for external access.
 ```
@@ -45,6 +56,7 @@ kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-pass
 kubectl port-forward service/grafana --address 0.0.0.0 30001:80 --namespace monitoring
 ```
 ![alt text](image-7.png)
+
 
 
 
