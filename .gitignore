@@ -5,7 +5,7 @@ tls.key
 *.ini
 inventory.ini
 # Local .terraform directories
-**/.terraform/*
+/.terraform/*
 
 # .tfstate files
 *.tfstate

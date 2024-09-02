@@ -1,62 +1,128 @@
-# Day 25 Task
+# Day-26
 
-**Project Steps and Deliverables:**
+# Project
 
-1. **Create and Configure an S3 Bucket:**
- - Create an S3 bucket named techvista-portfolio-palash.
+## Deploying a Path-Based Routing Web Application on AWS
+
+### Objective:
+
++ To evaluate your skills in deploying a web application on AWS using EC2 instances, configuring security groups, and setting up an Application Load Balancer (ALB) with path-based routing. You will deploy two simple web applications, configure the ALB to route traffic based on the URL path, and terminate all resources once the project is complete.
+
+## Project Scenario:
+
++ A small company needs to deploy two lightweight web applications, "App1" and "App2," on AWS. The traffic to these applications should be routed through a single Application Load Balancer (ALB) based on the URL path. The company has opted for t2.micro instances for cost efficiency.
+
+### Project Steps and Deliverables:
+
+### 1. EC2 Instance Setup (30 minutes):
+
++ Launch EC2 Instances:
+    
+    + Launch four EC2 t2.micro instances using the Amazon Linux 2 AMI.
+
+
 ![alt text](image.png)
- 
- - Enable versioning on the bucket.
-
- - Set up the bucket for static website hosting.
-
- - Upload the provided static website files (HTML, CSS, Js, images).
-
-![alt text](image-1.png)
-
- - Ensure the website is accessible via the S3 website URL.
-```
-http://techvista-portfolio-palash.s3-website.ap-south-1.amazonaws.com/
-```
-
-![alt text](image-4.png)
 
 
-2. **Implement S3 Storage Classes:**
- - Classify the uploaded content into different S3 storage classes (e.g., Standard, Intelligent-Tiering, Glacier).
++ SSH into each instance and deploy a simple web application:
+        
+    + Deploy "App1" on two instances.
+        
+    + Deploy "App2" on the other two instances.
 
-![alt text](image-5.png)
++ Assign tags to the instances for identification (e.g., "App1-Instance1," "App1-Instance2," "App2-Instance1," "App2-Instance2").
 
- - Justify your choice of storage class for each type of content (e.g., HTML/CSS files vs. images).
-     - I chose the Standard storage class for HTML and js files because they are accessed frequently whenever users visit the website.
-    - For images, I selected the Intelligent-Tiering storage class because they are updated regularly and often feature new content.
 
-3. **Lifecycle Management:**
- - Create a lifecycle policy that transitions older versions of objects to a more cost-effective storage class (e.g., Standard to Glacier).
++  Navigate to path ```/var/www/html``` and modify the ``index.html``
 
- - Set up a policy to delete non-current versions of objects after 90 days.
 
-![alt text](image-8.png)
-
-![alt text](image-10.png)
-
-![alt text](image-11.png)
-
-![alt text](image-9.png)
-
- - Verify that the lifecycle rules are correctly applied.
 
 ![alt text](image-6.png)
 
-
-
-4. **Configure Bucket Policies and ACLs:**
- - Create and attach a bucket policy that allows read access to everyone for the static website content.
-
-![alt text](image-3.png)
-
- - Set up an ACL to allow a specific external user access to only a particular folder within the bucket.
-
 ![alt text](image-7.png)
 
+### 2. Security Group Configuration (20 minutes):
+
++ Create Security Groups:
+    
+    + Create a security group for the EC2 instances that allows inbound HTTP (port 80) and SSH (port 22) traffic from your IP address.
+
+
+
+
+
+![alt text](image-9.png)
+
+![alt text](image-10.png)
+
++ Create a security group for the ALB that allows inbound traffic on port 80.
+
+
+
+
++ Attach the appropriate security groups to the EC2 instances and ALB.
+
+
+### 3. Application Load Balancer Setup with Path-Based Routing (40 minutes):
+
++ Create an Application Load Balancer (ALB):
+    
+    + Set up an ALB in the same VPC and subnets as your EC2 instances.
+    
+    + Configure the ALB with two target groups:
+    
+       + Target Group 1: For "App1" instances.
+    
+       + Target Group 2: For "App2" instances.
+    
+    + Register the appropriate EC2 instances with each target group.
+
++ Configure Path-Based Routing:
+    
+    + Set up path-based routing rules on the ALB:
+    
+       + Route traffic to "App1" instances when the URL path is /app1.
+    
+       + Route traffic to "App2" instances when the URL path is /app2.
+    
+    + Set up health checks for each target group to ensure that the instances are healthy and available.
+
+![alt text](image-5.png)
+
+![alt text](image-8.png)
+
+![alt text](image-1.png)
+![alt text](image-2.png)
+
+### 4. Testing and Validation (20 minutes):
+
++ Test Path-Based Routing:
+
+    + Access the ALB's DNS name and validate that requests to /app1 are correctly routed to the "App1" instances and that /app2 requests are routed to the "App2" instances.
+
+
++ Security Validation:
+    
+    + Attempt to access the EC2 instances directly via their public IPs to ensure that only your IP address can SSH into the instances.
+
+
+
+### 5. Resource Termination (10 minutes):
+
++ Terminate EC2 Instances:
+
+    + Stop and terminate all EC2 instances.
+
+
+
+
++ Delete Load Balancer and Target Groups:
+
+    + Delete the ALB and the associated target groups.
+
+
+
++ Cleanup Security Groups:
+
+    + Delete the security groups created for the project.
 

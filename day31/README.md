@@ -1,210 +1,130 @@
-### Project: Advanced Terraform with Provisioners, Modules, and Workspaces
+# Project: Automation (IaaC) Terraform on AWS Assessment Project
 
-## Project Objective:
+## Project Overview
 
-+ This project is designed to evaluate participants' understanding of Terraform provisioners, modules, and workspaces. 
++ This capstone project is designed to assess participants' knowledge and practical skills with Terraform, specifically focusing on AWS. The project will require deploying a complete infrastructure using Terraform, emphasizing the usage of state lock, variables, .tfvars files, modules, functions, workspaces, and lifecycle rules. 
 
-+ The project involves deploying a basic infrastructure on AWS using Terraform modules, executing remote commands on the provisioned resources using provisioners, and managing multiple environments using Terraform workspaces.
++ The deployment will be restricted to AWS Free Tier resources to avoid unnecessary costs.
 
-+ All resources should be within the AWS Free Tier limits.
+## Project Objectives
 
-## Project Overview:
++ Deploy a multi-tier architecture on AWS using Terraform.
++ Implement state locking to manage concurrent changes.
++ Use variables and .tfvars files to parameterize configurations.
++ Create and use Terraform modules to promote reusability and organization.
++ Utilize functions to dynamically configure resources.
++ Manage multiple environments using Terraform workspaces.
++ Implement lifecycle rules to control resource creation, updates, and deletion.
 
-+ Participants will create a Terraform configuration that deploys an EC2 instance and an S3 bucket using a custom Terraform module. 
+## Project Requirements
 
-+ The project will also require the use of Terraform provisioners to execute scripts on the EC2 instance. 
+### 1. Infrastructure Design
 
-+ Finally, participants will manage separate environments (e.g., dev and prod) using Terraform workspaces.
++ The project will involve deploying a basic 3-tier web application architecture, which includes the following components:
 
-## Specifications:
+1. VPC: Create a Virtual Private Cloud (VPC) with public and private subnets across two availability zones.
+2. Security Groups: Define security groups to control inbound and outbound traffic for the application and database tiers.
+3. EC2 Instances: Deploy EC2 instances in the public subnets for the web servers (Application Tier).
+4. RDS Instance: Deploy an RDS MySQL instance in the private subnet for the database (Database Tier).
+5. S3 Bucket: Create an S3 bucket to store static files, with versioning enabled.
+6. Elastic IPs: Assign Elastic IPs to the EC2 instances.
+7. IAM Role: Create an IAM role with the necessary permissions and attach it to the EC2 instances.
 
-### 1. Terraform Modules:
+### 2. Terraform State Management
 
-+ Create a reusable module to deploy an EC2 instance and an S3 bucket.
++  Implement remote state storage using an S3 bucket to store the Terraform state file.
++  Use DynamoDB for state locking to prevent concurrent modifications.
 
-+ The EC2 instance should be of type t2.micro, and the S3 bucket should be configured for standard storage.
-
-+ The module should accept input variables for the instance type, AMI ID, key pair name, and bucket name.
-
-+ Outputs should include the EC2 instance’s public IP and S3 bucket’s ARN.
-
-### 2. Terraform Provisioners:
-
-+ Use remote-exec and local-exec provisioners to perform post-deployment actions on the EC2 instance.
-
-+ The remote-exec provisioner should be used to connect to the EC2 instance via SSH and run a script that installs Apache HTTP Server.
-
-+ The local-exec provisioner should be used to output a message on the local machine indicating the deployment status, such as "EC2 instance successfully provisioned with Apache."
-
-
-### 3. Terraform Workspaces:
-
-+ Implement Terraform workspaces to manage separate environments (e.g., dev and prod).
-
-+ Each workspace should deploy the same infrastructure (EC2 and S3) but with different configurations (e.g., different tags or bucket names).
-
-+ Ensure that the state for each workspace is managed separately to prevent conflicts between environments.
-
-### Key Tasks:
-
-### 1. Module Development:
-
-+ Module Setup: Create a directory for the module 
+### 3. Variables and tfvars
 
 
++ Define input variables for resources like VPC CIDR, instance types, database username/password, and S3 bucket names.
++ Use .tfvars files to pass different configurations for environments (e.g., dev.tfvars, prod.tfvars).
 
-+ Resource Definitions: Define the resources for an EC2 instance and an S3 bucket within the module.
+### 4. Modules
 
-```hcl
-resource "aws_instance" "ec2_instance" {
-  ami            = var.ami_id
-  instance_type  = var.instance_type
-  key_name       = var.key_name
++ Break down the infrastructure into reusable modules:
+    
+    + VPC Module: Manage VPC, subnets, and routing tables.
+    + EC2 Module: Configure and launch EC2 instances.
+    + RDS Module: Set up the RDS MySQL database.
+    + S3 Module: Handle S3 bucket creation with versioning.
+    + IAM Module: Create and manage IAM roles and policies.
 
-  tags = {
-    Name = "palash-ec2"
-  }
-}
+### 5. Functions
++ Use Terraform functions to dynamically configure:
+    
+    + The names of resources using format and join functions.
+    + Subnet CIDRs using cidrsubnet.
+    + Lookup values for AMI IDs using lookup function.
+
+### 6. Workspaces
+
++  Create workspaces for different environments (e.g., development, staging, production).
++  Deploy the infrastructure in each environment using the appropriate workspace.
+
+### 7. Lifecycle Rules
+
++ Implement lifecycle rules to:
+    + Prevent resource deletion: Ensure certain resources, like the RDS database, are not accidentally deleted (prevent_destroy).
+    + Ignore changes to specific resource attributes (e.g., S3 bucket tags) using ignore_changes.
+
+### Project Steps
+
+#### Step 1: Setup Remote State and Locking
+
+1. Create an S3 bucket for storing Terraform state.
+2. Create a DynamoDB table for state locking.
+3. Configure the backend in Terraform to use the S3 bucket and DynamoDB table.
+
+#### Step 2: Develop and Organize Modules
+
+1. Develop separate modules for VPC, EC2, RDS, S3, and IAM.
+2. Place each module in a separate directory with main.tf, variables.tf, and outputs.tf.
 
 
-resource "aws_s3_bucket" "s3_bucket" {
-  bucket = var.bucket_name
-}
+#### Step 3: Define Variables and tfvars Files
 
+1. Define variables in variables.tf files within each module.
+
+
+
+2. Create a terraform.tfvars file with default values.
+
+
+
+
+3. Create separate environment-specific .tfvars files (e.g., dev.tfvars, prod.tfvars).
+
+
+#### Step 4: Implement Workspaces
+
+-   Initialize Terraform and create workspaces (development, staging, production).
+
+```sh
+terraform workspace new development
+terraform workspace new production
+terraform workspace new staging
 ```
-
-+ Variable Inputs: Define input variables for instance type, AMI ID, key pair name, and S3 bucket name.
-
-```hcl
-variable "ami_id" {
-  description = "AMI ID for the EC2 instance"
-  type        = string
-}
-
-variable "instance_type" {
-  description = "Type of the EC2 instance"
-  type        = string
-}
-
-variable "key_name" {
-  description = "Name of the SSH key pair"
-  type        = string
-}
-
-variable "bucket_name" {
-  description = "Name of the S3 bucket"
-  type        = string
-}
-
-variable "private_key_path" {
-  description = "Path to the private key for SSH access"
-  type        = string
-}
-```
-
-+ Outputs: Define outputs for the EC2 instance's public IP and the S3 bucket's ARN.
-
-
-![alt text](image-5.png)
-
-![alt text](image-4.png)
-
-### 2. Main Terraform Configuration:
-
-+ Main Config Setup: In the root directory, create a Terraform configuration that calls the custom module.
-
-+ Backend Configuration: Configure Terraform to use local state storage for simplicity (optional for Free Tier compliance).
-
-### 3. Provisioner Implementation:
-
-+ Remote Execution: Use the remote-exec provisioner to SSH into the EC2 instance and execute a script that installs Apache.
-
-```hcl
- provisioner "remote-exec" {
-    inline = [
-      "sudo apt-get update",
-      "sudo apt-get install -y apache2",
-      "sudo systemctl start apache2",
-      "sudo systemctl enable apache2"
-    ]
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      private_key = file(var.private_key_path)
-      host        = self.public_ip
-    }
-  }
-```
-
-
-+ Local Execution: Use the local-exec provisioner to print a confirmation message on the local machine after successful deployment.
-
-
-```hcl
-provisioner "local-exec" {
-  command = "echo 'EC2 instance successfully provisioned with Apache' >> terraform_output.log"
-}
-```
-
-![alt text](image.png)
 
 ![alt text](image-1.png)
 
-### 4. Workspace Management:
 
-+ Workspace Creation: Create Terraform workspaces for dev and prod.
+#### Step 5: Deploy the Infrastructure
 
-+ Environment-Specific Configurations: Customize the EC2 instance tags and S3 bucket names for each workspace to differentiate between environments.
-
-+ Workspace Deployment: Deploy the infrastructure separately in the dev and prod workspaces.
-
-+ Create and switch to the dev workspace:
-
-```sh
-terraform workspace new dev
-```
-
-+ Deploy the infrastructure in the dev workspace:
-
-```sh
-terraform apply -auto-approve
-```
-
-+ Create and switch to the prod workspace:
-
-```sh
-terraform workspace new prod
-```
-+ Deploy the infrastructure in the prod workspace:
-
-```sh
-terraform apply -auto-approve
-```
-
-
-
-
-### 5. Validation and Testing:
-
-+ Apache Installation Verification: After the deployment, verify that Apache is installed and running on the EC2 instance by accessing the public IP address in a web browser.
+-   Use the terraform apply command to deploy the infrastructure in each workspace.
 
 ![alt text](image-2.png)
 
 ![alt text](image-3.png)
 
 
+#### Step 6: Cleanup
 
-### 6. Resource Cleanup:
+1. Destroy the infrastructure in each workspace using terraform destroy.
 
-+ Destroy Resources: Use terraform destroy to remove the resources in both workspaces.
+2. Ensure that resources marked with prevent_destroy are not deleted.
+
+![alt text](image-5.png)
 
 ![alt text](image-6.png)
-
-
-
-
-
-
-
-
-
