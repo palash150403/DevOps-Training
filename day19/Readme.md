@@ -30,7 +30,7 @@ ansible-galaxy init roles/database
 ansible-galaxy init roles/application
 ```
 
-![alt text](images/image.png)
+![alt text](image.png)
 
 ### Milestone 3: Version Control with Git
 
@@ -293,7 +293,7 @@ import boto3
 
 def get_inventory():
     ec2 = boto3.client('ec2', region_name='ap-south-1')
-    response = ec2.describe_instances(Filters=[{'Name': 'tag:Role', 'Values': ['webserver']}, {'Name': 'tag:Name', 'Values': ['Yaksh']}])
+    response = ec2.describe_instances(Filters=[{'Name': 'tag:Role', 'Values': ['webserver']}, {'Name': 'tag:Name', 'Values': ['palash']}])
 
     inventory = {
         'all': {
@@ -305,7 +305,7 @@ def get_inventory():
         }
     }
 
-    ssh_key_file = '/home/einfochips/DevOps-Training/day20/roles/ansible-new.pem'
+    ssh_key_file = '/home/einfochips/DevOps-Training/day19/roles/ansible-new.pem'
     user = 'ubuntu'
 
     for reservation in response['Reservations']:
@@ -331,13 +331,18 @@ if __name__ == '__main__':
 ***Tasks:***
 
 + Develop a master playbook that includes all roles.
-
 + Define inventory and variable files for different environments.
 
 + Execute the playbook to deploy the web application on the EC2 instance.
+
+![alt text](image-4.png)
+
+![alt text](image-3.png)
+
 
 ***Deliverables:***
 
 + Ansible playbook for web application deployment.
 
 + Successfully deployed web application on the EC2 instance.
+![alt text](image-1.png)
